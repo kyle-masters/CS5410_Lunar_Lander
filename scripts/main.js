@@ -1,6 +1,9 @@
-
 MyGame.main = (function (screens){
     'use strict';
+
+    let keyBindings = {
+        keys: {}
+    }
 
     function showScreen(id) {
 
@@ -15,6 +18,11 @@ MyGame.main = (function (screens){
     }
 
     function initialize() {
+        keyBindings.keys.thrust = 'up';
+        keyBindings.keys.lRotate = 'left';
+        keyBindings.keys.rRotate = 'right';
+
+
         let screen = null;
 
         for (screen in screens) {
@@ -26,9 +34,14 @@ MyGame.main = (function (screens){
         showScreen('main-menu');
     }
 
+    function setBinding(e, control) {
+
+    }
+
     return {
         initialize : initialize,
-        showScreen : showScreen
+        showScreen : showScreen,
+        get keyBindings() { return keyBindings; }
     }
 
 }(MyGame.screens));

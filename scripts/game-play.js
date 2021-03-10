@@ -23,7 +23,6 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
     function render() {
         graphics.clear();
         renderer.Background.render(myBackground);
-
     }
 
     function gameLoop(time) {
@@ -40,6 +39,24 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
     }
 
     function initialize() {
-        myKeyboard.register('')
+        myKeyboard.register('Escape', function () {
+            cancelNextRequest = true;
+            game.showScreen('main-menu');
+        })
+
+        let canvas = document.getElementById('myCanvas');
+        let mouseCapture = false;
     }
-})
+
+    function run() {
+        lastTimeStamp = performance.now();
+        cancelNextRequest = false;
+        requestAnimationFrame(gameLoop);
+    }
+
+    return {
+        initialize : initialize,
+        run : run
+    };
+
+}(MyGame.main, MyGame.objects, MyGame.render, MyGame.graphics, MyGame.input));
