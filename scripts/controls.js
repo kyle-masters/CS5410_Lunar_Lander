@@ -10,21 +10,21 @@ MyGame.screens['controls'] = (function(game) {
         document.getElementById('thrust-control-button').addEventListener(
             'click',
             function() {
-                window.addEventListener('keypress', setThrust);
+                window.addEventListener('keydown', setThrust);
             }
         )
 
         document.getElementById('left-rotate-control-button').addEventListener(
             'click',
             function() {
-                window.addEventListener('keypress', setLRotate);
+                window.addEventListener('keydown', setLRotate);
             }
         )
 
         document.getElementById('right-rotate-control-button').addEventListener(
             'click',
             function() {
-                window.addEventListener('keypress', setRRotate);
+                window.addEventListener('keydown', setRRotate);
             }
         )
 
@@ -36,19 +36,19 @@ MyGame.screens['controls'] = (function(game) {
     function setThrust(e) {
         game.keyBindings.keys.thrust = e.key;
         document.getElementById('thrust-control-button').innerText = "Thrust - " + e.key;
-        window.removeEventListener('keypress', setThrust);
+        window.removeEventListener('keydown', setThrust);
     }
 
     function setLRotate(e) {
         game.keyBindings.keys.lRotate = e.key;
         document.getElementById('left-rotate-control-button').innerText = "Rotate Left - " + e.key;
-        window.removeEventListener('keypress', setLRotate);
+        window.removeEventListener('keydown', setLRotate);
     }
 
     function setRRotate(e) {
         game.keyBindings.keys.rRotate = e.key;
         document.getElementById('right-rotate-control-button').innerText = "Rotate Right - " + e.key;
-        window.removeEventListener('keypress', setRRotate);
+        window.removeEventListener('keydown', setRRotate);
     }
 
     function run() {}

@@ -44,11 +44,33 @@ MyGame.graphics = (function () {
         context.restore();
     }
 
+    function drawLines(spec) {
+        context.save();
+
+        context.strokeStyle = spec.strokeStyle;
+        context.lineWidth = spec.lineWidth;
+        context.fillStyle = spec.fillStyle;
+
+        context.beginPath();
+        context.moveTo(spec.lines[0].x1, spec.lines[0].y1);
+        for (let i = 0; i < spec.lines.length; i++) {
+            context.lineTo(spec.lines[i].x2, spec.lines[i].y2);
+        }
+        context.stroke();
+        context.lineTo(spec.lines[spec.lines.length - 1].x2, canvas.height);
+        context.lineTo(spec.lines[0].x1, canvas.height);
+        context.closePath();
+        context.fill();
+
+        context.restore();
+    }
+
     let api = {
         get canvas() { return canvas; },
         clear : clear,
         drawTexture : drawTexture,
-        drawText : drawText
+        drawText : drawText,
+        drawLines : drawLines
     };
 
     return api;

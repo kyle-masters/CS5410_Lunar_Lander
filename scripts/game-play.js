@@ -1,6 +1,12 @@
 MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input) {
     'use strict';
 
+    let terrain = {
+        strokeStyle: 'white',
+        lineWidth: '2',
+        fillStyle: 'DimGray'
+    }
+
     let lastTimeStamp = performance.now();
     let cancelNextRequest = true;
 
@@ -23,6 +29,7 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
     function render() {
         graphics.clear();
         renderer.Background.render(myBackground);
+        graphics.drawLines(terrain);
     }
 
     function gameLoop(time) {
@@ -48,7 +55,117 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         let mouseCapture = false;
     }
 
+    function generateTerrain(safeZones, surfaceRoughness, smallestWidth, safeWidth, maxHeight, canvasWidth) {
+
+
+        let elevation = [];
+
+
+
+        for (let i = 0; i < safeZones; i++) {
+            let min, max;
+            if (i === 0) {
+                min = 0.15 * canvasWidth;
+                max = ((1-(safeZones * 0.15)) * canvasWidth) - (safeZones * safeWidth);
+            }
+            if (i === 1) {
+                min = elevation[0].x2 + (0.15 * canvasWidth);
+                max = (0.85 * canvasWidth) - safeWidth;
+            }
+            let randStart = Math.floor(Math.random() * (max - min) + min);
+            let randHeight = Math.floor(Math.random() * maxHeight);
+
+            elevation.push({
+                "safeZone": true,
+                "x1": randStart,
+                "x2": randStart + safeWidth,
+                "y1": randHeight,
+                "y2": randHeight
+            });
+        }
+
+        let toSplit = [];
+
+        toSplit.push({
+            "iteration": 0,
+            "safeZone": false,
+            "x1": 0,
+            "x2": elevation[0].x1,
+            "y1": Math.floor(Math.random() * maxHeight),
+            "y2": elevation[0].y1
+        });
+
+        if (safeZones === 2) {
+            toSplit.push({
+                "iteration": 0,
+                "safeZone": false,
+                "x1": elevation[0].x2,
+                "x2": elevation[1].x1,
+                "y1": elevation[0].y2,
+                "y2": elevation[1].y1
+            });
+        }
+
+        toSplit.push({
+            "iteration": 0,
+            "safeZone": false,
+            "x1": elevation[safeZones-1].x2,
+            "x2": myCanvas.width,
+            "y1": elevation[safeZones-1].y2,
+            "y2": Math.floor(Math.random() * maxHeight)
+        });
+
+        while (toSplit.length > 0) {
+            let line = toSplit.pop();
+            let line1, line2;
+            let rand = Math.random() * 2 - 1
+            let y = Math.floor(.5 * (line.y1 + line.y2) + ((surfaceRoughness/Math.sqrt(line.iteration)) * rand * Math.abs(line.x2 - line.x1)));
+            if (y < 0) y = 0;
+            if (y > maxHeight) y = maxHeight;
+            line1 = {
+                "iteration": line.iteration + 1,
+                "safeZone": false,
+                "x1": line.x1,
+                "x2": Math.floor((line.x2 + line.x1)/2),
+                "y1": line.y1,
+                "y2": y
+            };
+            line2 = {
+                "iteration": line.iteration + 1,
+                "safeZone": false,
+                "x1": Math.floor((line.x2 + line.x1)/2),
+                "x2": line.x2,
+                "y1": y,
+                "y2": line.y2
+            };
+            if (line1.x2 - line.x1 > smallestWidth) toSplit.push(line1);
+            else elevation.push(line1);
+            if (line2.x2 - line.x1 > smallestWidth) toSplit.push(line2);
+            else elevation.push(line2);
+        }
+
+        elevation.sort(function(a, b) {
+            return a.x1 - b.x1;
+        })
+
+        for (let i = 0; i < elevation.length; i++) {
+            elevation[i].y1 = myCanvas.height - elevation[i].y1;
+            elevation[i].y2 = myCanvas.height - elevation[i].y2;
+        }
+
+        return elevation;
+    }
+
     function run() {
+        terrain.lines = generateTerrain(
+            2,
+            1.5,
+            10,
+            50,
+            MyGame.graphics.canvas.height/2,
+            MyGame.graphics.canvas.width
+        );
+
         lastTimeStamp = performance.now();
         cancelNextRequest = false;
         requestAnimationFrame(gameLoop);
