@@ -27,7 +27,7 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         accelRate: 1 / 1000,
         maxMoveRate: 500 / 1000,
         rotateRate: Math.PI / 1000
-    })
+    });
 
     function processInput(elapsedTime) {
         myKeyboard.update(elapsedTime);
@@ -173,6 +173,15 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
             MyGame.graphics.canvas.width
         );
 
+        myShip = objects.Ship({
+            imageSrc: 'assets/lander.png',
+            center: {x: graphics.canvas.width/2, y: graphics.canvas.height/8},
+            size: {width: 50, height: 50},
+            accelRate: 1 / 1000,
+            maxMoveRate: 500 / 1000,
+            rotateRate: Math.PI / 1000
+        });
+
         myKeyboard = input.Keyboard();
         myKeyboard.register(game.keyBindings.keys.thrust, myShip.moveForward);
         myKeyboard.register(game.keyBindings.keys.lRotate, myShip.rotateLeft);
@@ -180,7 +189,7 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         myKeyboard.register('Escape', function () {
             cancelNextRequest = true;
             game.showScreen('main-menu');
-        })
+        });
 
         lastTimeStamp = performance.now();
         cancelNextRequest = false;
