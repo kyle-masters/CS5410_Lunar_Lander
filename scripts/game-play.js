@@ -1,6 +1,8 @@
 MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input) {
     'use strict';
 
+
+
     let terrain = {
         strokeStyle: 'white',
         lineWidth: '2',
@@ -18,6 +20,15 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         size: {width: graphics.canvas.width, height: graphics.canvas.height},
     });
 
+    let myShip = objects.Ship({
+        imageSrc: 'assets/lander.png',
+        center: {x: graphics.canvas.width/2, y: graphics.canvas.height/8},
+        size: {width: 50, height: 50},
+        accelRate: 1 / 1000,
+        maxMoveRate: 500 / 1000,
+        rotateRate: Math.PI / 1000
+    })
+
     function processInput(elapsedTime) {
         myKeyboard.update(elapsedTime);
     }
@@ -30,6 +41,7 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         graphics.clear();
         renderer.Background.render(myBackground);
         graphics.drawLines(terrain);
+        renderer.Ship.render(myShip);
     }
 
     function gameLoop(time) {
@@ -46,11 +58,6 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
     }
 
     function initialize() {
-        myKeyboard.register('Escape', function () {
-            cancelNextRequest = true;
-            game.showScreen('main-menu');
-        })
-
         let canvas = document.getElementById('myCanvas');
         let mouseCapture = false;
     }
@@ -165,6 +172,15 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
             MyGame.graphics.canvas.height/2,
             MyGame.graphics.canvas.width
         );
+
+        myKeyboard = input.Keyboard();
+        myKeyboard.register(game.keyBindings.keys.thrust, myShip.moveForward);
+        myKeyboard.register(game.keyBindings.keys.lRotate, myShip.rotateLeft);
+        myKeyboard.register(game.keyBindings.keys.rRotate, myShip.rotateRight);
+        myKeyboard.register('Escape', function () {
+            cancelNextRequest = true;
+            game.showScreen('main-menu');
+        })
 
         lastTimeStamp = performance.now();
         cancelNextRequest = false;

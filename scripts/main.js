@@ -18,9 +18,9 @@ MyGame.main = (function (screens){
     }
 
     function initialize() {
-        keyBindings.keys.thrust = 'up';
-        keyBindings.keys.lRotate = 'left';
-        keyBindings.keys.rRotate = 'right';
+        keyBindings.keys.thrust = 'ArrowUp';
+        keyBindings.keys.lRotate = 'ArrowLeft';
+        keyBindings.keys.rRotate = 'ArrowRight';
 
 
         let screen = null;
