@@ -1,7 +1,8 @@
 MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input) {
     'use strict';
 
-
+    let landerRatio = 26.0/50.0;
+    let landerHeight;
 
     let terrain = {
         strokeStyle: 'white',
@@ -20,21 +21,15 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         size: {width: graphics.canvas.width, height: graphics.canvas.height},
     });
 
-    let myShip = objects.Ship({
-        imageSrc: 'assets/lander.png',
-        center: {x: graphics.canvas.width/2, y: graphics.canvas.height/8},
-        size: {width: 50, height: 50},
-        accelRate: 1 / 1000,
-        maxMoveRate: 500 / 1000,
-        rotateRate: Math.PI / 1000
-    });
+    let myShip;
 
     function processInput(elapsedTime) {
         myKeyboard.update(elapsedTime);
     }
 
-    function update() {
-
+    function update(elapsedTime) {
+        myShip.makeMovement(elapsedTime);
+        myShip.detectCollision(terrain.lines);
     }
 
     function render() {
@@ -49,7 +44,7 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         lastTimeStamp = time;
 
         processInput(elapsedTime);
-        update();
+        update(elapsedTime);
         render();
 
         if (!cancelNextRequest) {
@@ -60,6 +55,7 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
     function initialize() {
         let canvas = document.getElementById('myCanvas');
         let mouseCapture = false;
+        landerHeight = graphics.canvas.height/10;
     }
 
     function generateTerrain(safeZones, surfaceRoughness, smallestWidth, safeWidth, maxHeight, canvasWidth) {
@@ -168,22 +164,21 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
             2,
             1.5,
             10,
-            50,
-            MyGame.graphics.canvas.height/2,
-            MyGame.graphics.canvas.width
+            graphics.canvas.width / 10,
+            graphics.canvas.height / 2,
+            graphics.canvas.width
         );
 
         myShip = objects.Ship({
             imageSrc: 'assets/lander.png',
             center: {x: graphics.canvas.width/2, y: graphics.canvas.height/8},
-            size: {width: 50, height: 50},
-            accelRate: 1 / 1000,
-            maxMoveRate: 500 / 1000,
+            size: {width: landerRatio*landerHeight, height: landerHeight},
+            accelRate: landerHeight / 20000,
             rotateRate: Math.PI / 1000
         });
 
         myKeyboard = input.Keyboard();
-        myKeyboard.register(game.keyBindings.keys.thrust, myShip.moveForward);
+        myKeyboard.register(game.keyBindings.keys.thrust, myShip.accelerate);
         myKeyboard.register(game.keyBindings.keys.lRotate, myShip.rotateLeft);
         myKeyboard.register(game.keyBindings.keys.rRotate, myShip.rotateRight);
         myKeyboard.register('Escape', function () {
