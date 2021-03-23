@@ -1,6 +1,7 @@
 MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input) {
     'use strict';
 
+    let level;
     let landerRatio = 26.0/50.0;
     let landerHeight;
 
@@ -8,7 +9,7 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         strokeStyle: 'white',
         lineWidth: '2',
         fillStyle: 'DimGray'
-    }
+    };
 
     let lastTimeStamp = performance.now();
     let cancelNextRequest = true;
@@ -29,7 +30,19 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
 
     function update(elapsedTime) {
         myShip.makeMovement(elapsedTime);
-        myShip.detectCollision(terrain.lines);
+        let collisionEvent = myShip.detectCollision(terrain.lines);
+        if(collisionEvent.collision) {
+            if (collisionEvent.safeLanding) {
+                level += 1;
+                nextLevelAnimation();
+            }
+            cancelNextRequest = true;
+            console.log(myShip.detectCollision(terrain.lines).safeLanding);
+        }
+    }
+
+    function newLevel() {
+        
     }
 
     function render() {
@@ -43,8 +56,8 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         let elapsedTime = time - lastTimeStamp;
         lastTimeStamp = time;
 
-        processInput(elapsedTime);
-        update(elapsedTime);
+        processInput(10);
+        update(10);
         render();
 
         if (!cancelNextRequest) {
@@ -160,8 +173,9 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
     }
 
     function run() {
+        level = 1;
         terrain.lines = generateTerrain(
-            2,
+            3 - level,
             1.5,
             10,
             graphics.canvas.width / 10,
@@ -181,6 +195,9 @@ MyGame.screens['game-play'] = (function(game, objects, renderer, graphics, input
         myKeyboard.register(game.keyBindings.keys.thrust, myShip.accelerate);
         myKeyboard.register(game.keyBindings.keys.lRotate, myShip.rotateLeft);
         myKeyboard.register(game.keyBindings.keys.rRotate, myShip.rotateRight);
+        myKeyboard.register('g', function () {
+            stop();
+        });
         myKeyboard.register('Escape', function () {
             cancelNextRequest = true;
             game.showScreen('main-menu');

@@ -35,7 +35,7 @@ MyGame.graphics = (function () {
         context.textBaseline = 'top';
 
         context.translate(spec.position.x, spec.position.y);
-        context.translate(spec.rotation);
+        context.rotate(spec.rotation);
         context.translate(-spec.position.x, -spec.position.y);
 
         context.fillText(spec.text, spec.position.x, spec.position.y);
